@@ -1,0 +1,40 @@
+apiVersion: eks.amazonaws.com/v1
+kind: NodeClass
+metadata:
+  name: large-ip-pool-nodeclass
+spec:
+  role: ip-exhaustion-demo-node-role
+  
+  # Node subnets (Large dedicated subnets for nodes)
+  subnetSelectorTerms:
+    - tags:
+        Environment: "demo"
+        Component: "eks-nodes-large"
+        kubernetes.io/role/internal-elb: "1"
+  
+  # Pod subnets (new large subnets for pods in Phase 2)
+  podSubnetSelectorTerms:
+    - tags:
+        Environment: "demo"
+        Component: "eks-pods"
+        kubernetes.io/role/pod: "1"
+  
+  # Security groups - use EKS-managed security group
+  securityGroupSelectorTerms:
+    - tags:
+        Environment: "demo"
+        Component: "eks-cluster"
+  
+  # Pod security groups (required with podSubnetSelectorTerms)
+  podSecurityGroupSelectorTerms:
+    - tags:
+        Environment: "demo"
+        Component: "eks-cluster"
+  
+  # Optional: Ephemeral storage
+  ephemeralStorage:
+    size: "80Gi"
+  
+  tags:
+    Environment: demo
+    Project: ip-exhaustion-demo

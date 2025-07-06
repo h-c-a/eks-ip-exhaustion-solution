@@ -1,0 +1,32 @@
+apiVersion: karpenter.sh/v1
+kind: NodePool
+metadata:
+  name: ip-exhaustion-demo-nodepool
+spec:
+  template:
+    metadata:
+      labels:
+        Project: ip-exhaustion-demo
+        Environment: demo
+        NodeType: ip-exhaustion-demo-node
+    spec:
+      nodeClassRef:
+        group: eks.amazonaws.com
+        kind: NodeClass
+        name: large-ip-pool-nodeclass
+      requirements:
+        - key: "karpenter.sh/capacity-type"
+          operator: In
+          values: ["on-demand"]
+        - key: "eks.amazonaws.com/instance-category"
+          operator: In
+          values: ["c", "m", "r"]
+        - key: "eks.amazonaws.com/instance-cpu"
+          operator: In
+          values: ["4", "8", "16"]
+        - key: "kubernetes.io/arch"
+          operator: In
+          values: ["amd64"]
+  limits:
+    cpu: "1000"
+    memory: 1000Gi
